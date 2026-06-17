@@ -1,6 +1,8 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
+//TODO: Agregar paredes y colisionar con ellas
+//TODO: Poner un personaje nuevo con movimiento propio (que suba y baje/izquierda o derecha) y con imagen
 
 #define ANCHO 800
 #define ALTO  600
@@ -39,7 +41,6 @@ int main()
     al_register_event_source(queue, al_get_keyboard_event_source());
 
     // Posición inicial y tamaño del cuadrado
-    //TODO: Crear estructura cuadrada con los campos x, y, ancho, alto y velocidad
     jugador.x = ANCHO / 2.0;
     jugador.y = ALTO / 2.0;
     jugador.alto = 50.0; // El cuadrado medirá 50x50 píxeles
@@ -71,6 +72,19 @@ int main()
             if (teclas[RIGHT])
                 jugador.x += jugador.velocidad;
 
+                // Colisión con los bordes de la ventana
+             if (jugador.x - jugador.ancho / 2 < 0)
+                 jugador.x = jugador.ancho / 2;
+
+            if (jugador.x + jugador.ancho / 2 > ANCHO)
+                jugador.x = ANCHO - jugador.ancho / 2;
+
+            if (jugador.y - jugador.alto / 2 < 0)
+                jugador.y = jugador.alto / 2;
+
+            if (jugador.y + jugador.alto / 2 > ALTO)
+                jugador.y = ALTO - jugador.alto / 2;
+                
             redibujar = true;
         }
         else if (evento.type == ALLEGRO_EVENT_KEY_DOWN) {
