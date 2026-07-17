@@ -1,81 +1,98 @@
 #include "globales.h"
 #include <stdio.h>
 
-// CREACION REAL DE LAS VARIABLES EN MEMORIA
+// Definiciones de las variables que declaraste como "extern" en el .h
 char matriz_nivel[FILAS][COLUMNAS];
 ALLEGRO_FONT *letra_interfaz = NULL;
 struct Personaje jugador;
 struct Enemigo malo;
+struct Gaviota gaviota;
+struct EstadoJuego juego;
 
-// INICIALIZACIÓN DE ESTRUCTURA DE JUEGO
-struct EstadoJuego juego = {
-    .puntos = 0,
-    .segundos_restantes = 120.0,
-    .nivel_actual = 1,
-    .camara_x = 0,
-    .salir = false,
-    .redibujar = true,
-    .teclas = {false, false, false, false},
-    .debe_teletransportar = false
-};
+// Definición de los punteros a sprites
+ALLEGRO_BITMAP *sprite_palanca_desactivada = NULL;
+ALLEGRO_BITMAP *sprite_palanca_activada = NULL;
+ALLEGRO_BITMAP *sprite_gaviota1 = NULL;
+ALLEGRO_BITMAP *sprite_gaviota2 = NULL;
+ALLEGRO_BITMAP *sprite_caca = NULL;
 
-// FUNCION PARA LEER EL ARCHIVO DE TEXTO DEL NIVEL
+// Implementacion de la funcion cargar_nivel
 void cargar_nivel(const char *nombre_archivo) {
     FILE *archivo = fopen(nombre_archivo, "r");
-    if (archivo == NULL) {
-        printf("Error: No se pudo abrir %s\n", nombre_archivo);
-        return;
-    }
+    if (!archivo) return;
 
-    int f = 0;
-    int c = 0;
-    char ch;
+    // limpia la matriz
+    for (int f = 0; f < FILAS; f++)
+        for (int c = 0; c < COLUMNAS; c++)
+            matriz_nivel[f][c] = ' ';
 
-    // Se limpia la matriz con espacios vacios antes de rellenar
-    for (int i = 0; i < FILAS; i++) {
-        for (int j = 0; j < COLUMNAS; j++) {
-            matriz_nivel[i][j] = ' ';
-        }
-    }
+    int f = 0, c = 0;
+    int caracter;
 
-    // Lee el archivo caracter por caracter ignorando saltos de linea desfasados
-    while ((ch = fgetc(archivo)) != EOF && f < FILAS) {
-        if (ch == '\n' || ch == '\r') {
-            if (c > 0) { 
-                f++;
-                c = 0;
-            }
-        } 
-        else if (c < COLUMNAS) {
-            matriz_nivel[f][c] = ch;
+    while ((caracter = fgetc(archivo)) != EOF) {
+        if (caracter == '\n') {
+            f++;
+            c = 0;
+        } else if (f < FILAS && c < COLUMNAS) {
+            matriz_nivel[f][c] = (char)caracter;
             c++;
         }
     }
-
     fclose(archivo);
 }
 
-// FUNCION PARA BUSCAR LA 'P' Y LA 'E' EN EL MAPA
+// Implementacion de la funcion actualizar_gaviota
+void actualizar_gaviota(void) {
+    // Movimiento de izquierda a derecha
+    gaviota.x += gaviota.velocidad;
+    if (gaviota.x > (COLUMNAS * TAM_BLOQUE) - 100 || gaviota.x < 0) {
+        gaviota.velocidad *= -1;
+    }
+    
+    // Timer para disparar caca
+    gaviota.timer_disparo++;
+    if (gaviota.timer_disparo > 60) { // Dispara cada 1 segundo
+        for(int i = 0; i < 5; i++) {
+            if (!gaviota.balas[i].activo) {
+                gaviota.balas[i].x = gaviota.x;
+                gaviota.balas[i].y = gaviota.y;
+                gaviota.balas[i].activo = true;
+                break;
+            }
+        }
+        gaviota.timer_disparo = 0;
+    }
+
+    // Movimiento de las cacas ya disparadas
+    for(int i = 0; i < 5; i++) {
+        if (gaviota.balas[i].activo) {
+            gaviota.balas[i].y += 4.0; // Caen hacia abajo
+            if (gaviota.balas[i].y > ALTO) gaviota.balas[i].activo = false;
+        }
+    }
+}
+
 void inicializar_nivel(void) {
+
+    juego.nivel_actual = 1;
+
+    malo.x = -100; 
+    malo.y = -100;
+
     for (int f = 0; f < FILAS; f++) {
         for (int c = 0; c < COLUMNAS; c++) {
-            
-            // Si encuentra la P, ubica al jugador de forma correcta
-            if (matriz_nivel[f][c] == 'P') {
-                jugador.x = (c * TAM_BLOQUE) + (TAM_BLOQUE / 2.0);
-                jugador.y = (f * TAM_BLOQUE) + (TAM_BLOQUE / 2.0);
+            if (matriz_nivel[f][c] == 'P') { 
+                jugador.x = c * TAM_BLOQUE + TAM_BLOQUE / 2;
+                jugador.y = f * TAM_BLOQUE + TAM_BLOQUE / 2;
             }
-            
-            // Si encuentra la E, ubica al malo en su posicion inicial
-            if (matriz_nivel[f][c] == 'E') {
-                malo.x = (c * TAM_BLOQUE) + (TAM_BLOQUE / 2.0);
-                malo.y = (f * TAM_BLOQUE) + (TAM_BLOQUE / 2.0);
+            if (matriz_nivel[f][c] == 'E') { 
+                malo.x = c * TAM_BLOQUE;
+                malo.y = f * TAM_BLOQUE;
+            }
+            if (matriz_nivel[f][c] == 'G') {
+                gaviota.x = c * TAM_BLOQUE;
+                gaviota.y = f * TAM_BLOQUE;
             }
         }
     }
-    
-    // Resetea las fisicas de caida y el tiempo para el nuevo nivel
-    jugador.vel_y = 0;
-    jugador.en_suelo = false;
-    juego.segundos_restantes = 120.0;
 }

@@ -1,11 +1,11 @@
 #include "globales.h"
 #include "fisicas.h"
 
-// LOGICA DE TIEMPO, GRAVEDAD Y MOVIMIENTO DEL ENEMIGO
+// Logica de tiempo, gravedad y movimiento del enemigo
 void actualizar_fisicas_juego(void) {
     float fuerza_gravedad = 0.5; 
     
-    // Control del reloj del juego (Tiempo en reversa)
+    // Control del reloj del juego (tiempo en reversa)
     if (juego.segundos_restantes > 0) {
         juego.segundos_restantes -= (1.0 / 60.0); 
     } else {

@@ -1,7 +1,7 @@
 #ifndef FISICAS_H
 #define FISICAS_H
 
-// FUNCION PARA PASAR EL TIEMPO Y APLICAR GRAVEDAD
+// Funcion para pasar el tiempo y aplicar gravedad
 void actualizar_fisicas_juego(void);
 
 #endif

@@ -12,14 +12,14 @@
 #                                                                                                                                                     #
 #                                                                                                                                                     #
 #                                                                                    #####                                                            #
-#                         O   O     #####      #######                                                                                                #
+#                         O   O     #####   #  #######                                                                                                #
 #                                                                            #####                                                                    #
 #                        #######                                                                                                                      #
-#                                                                   #####                                                                             #
-#               O   O                                      O   O                                                                                      #
+#                       #                                           #####                                                                             #
+#               O   O  #                                   O   O                                                                                      #
 #              #######                                    #######                                                                                     #
 #           ##                                                                                                                                        #
-#       P                                                                                                                                             #
+#       P #                                                                                                                                           #
 #     ####                                                                                                                                            #
 #     #  #      XXXXXX      XXXXXX      XXXXXX      XXXXXX      XXXXXX      XXXXXX      XXXXXX                                                        #
 #     #  #      XXXXXX      XXXXXX      XXXXXX      XXXXXX      XXXXXX      XXXXXX      XXXXXX        X      X      X         XXX                M    #
